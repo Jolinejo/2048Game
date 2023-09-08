@@ -9,13 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: NumbersGame
-
+    
+    func makeGame(){
+        viewModel.newGame()
+    }
+    
     var body: some View {
         VStack{
             Text("2048")
                 .font(.largeTitle)
             Text("Score is: \(viewModel.score)")
                 .font(.title)
+            
             ScrollView {
                 LazyVGrid (columns: [GridItem(.adaptive(minimum: 65))]) {
                     ForEach (viewModel.cards[0]) { card in
@@ -146,26 +151,30 @@ struct ContentView: View {
             }
             .scrollDisabled(true)
             .padding(.horizontal)
-            .alert(isPresented: $viewModel.alert) {
+            .sheet(isPresented: $viewModel.win) {
+                SecondView(win: $viewModel.win, action: makeGame)
+                    .presentationDetents([.medium, .large])
+                   }
+            .alert(isPresented: $viewModel.running) {
                 Alert(title: Text("You Lost"), message: Text("Game Over!"), dismissButton: Alert.Button.default(
-                    Text("New Game"), action: viewModel.newGame 
+                    Text("New Game"), action: viewModel.newGame
                 ))
-                    }
-            .alert(isPresented: $viewModel.win) {
-                Alert(title: Text("You Won!"), message: Text("New Game?"), primaryButton: .default(Text("Yes"), action: viewModel.newGame),
-                secondaryButton: .destructive(Text("No")))
-                    }
+            }
             Spacer()
             newGame
+
+            
         }
         .font(.largeTitle)
         .padding(.horizontal)
         .foregroundColor(Color("Ras"))
+        
+
     }
     
     var newGame: some View {
         Button{
-            viewModel.newGame()
+           viewModel.newGame()
         } label: {
             VStack {
                 Text("New Game")
@@ -178,6 +187,82 @@ struct ContentView: View {
     
 }
 
+struct SecondView: View {
+    
+    @State private var offset: CGFloat = 1000
+    @Binding var win: Bool
+    let action: () -> ()
+    
+    var body: some View {
+        ZStack{
+            Color(.black)
+                .opacity(0.5)
+            VStack {
+                Text("You Win!")
+                    .font(.title2)
+                    .bold()
+                    .padding()
+                
+                Text("New Game?")
+                    .font(.body)
+                
+                Button {
+                    action()
+                    close()
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundColor(Color("UV"))
+                        Text("Yes")
+                            .font(.title3)
+                            .padding()
+                    }
+                    .padding()
+                }
+                .padding()
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding()
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay {
+                VStack {
+                    HStack{
+                        Spacer()
+                        Button {
+                            close()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title2)
+                                .fontWeight(.medium)
+                        }
+                        .tint(.black)
+                    }
+                    Spacer()
+                }
+                .padding()
+            }
+            .shadow(radius: 20)
+            .padding(30)
+            .offset(x: 0, y: offset)
+            .onAppear {
+                withAnimation(.spring()) {
+                    offset = 0
+                }
+            }
+        }
+        
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            win = false
+        }
+    }
+
+}
+
 struct CardView: View {
     let card: Game<String>.Card
     
@@ -187,7 +272,7 @@ struct CardView: View {
             shape.fill(card.background)
             shape.strokeBorder(lineWidth: 3)
             Text(String(card.content))
-                .font(.largeTitle)
+                .font(.title)
             
         }
     }
@@ -211,15 +296,3 @@ struct CardView: View {
 
 
 
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        let game = NumbersGame()
-        ContentView(viewModel: game)
-            .preferredColorScheme(.dark)
-            .previewInterfaceOrientation(.portrait)
-        ContentView(viewModel: game)
-            .preferredColorScheme(.light)
-            
-    }
-}

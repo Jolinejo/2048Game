@@ -14,7 +14,7 @@ struct Game<CardContent> where CardContent: Equatable {
         
     private (set) var score: Int = 0
     
-    public var on: Bool = false
+    public var running: Bool = false
     
     public var win: Bool = false
     
@@ -63,6 +63,7 @@ struct Game<CardContent> where CardContent: Equatable {
         }
         cards = new_arr
         if empty.isEmpty {
+            print("HERE")
             var flag = true
             for i in (0...3){
                 for j in (0...3){
@@ -74,7 +75,8 @@ struct Game<CardContent> where CardContent: Equatable {
                     }
                 }
             }
-            on = flag
+            print(flag)
+            running = flag
         }
     }
     
@@ -208,7 +210,6 @@ struct Game<CardContent> where CardContent: Equatable {
         var zeros = true
         var new_arr = [[Card]]()
         for var row in cards {
-            for i in row {print(i.content)}
             zeros = true
             while zeros {
                 zeros = false
@@ -227,7 +228,6 @@ struct Game<CardContent> where CardContent: Equatable {
                     }
                 }
             }
-            for i in row {print(i.content)}
             for i in stride(from: 0, to: 4 - 1, by: 1) {
                 if row[i+1].content == row[i].content && row[i+1].content != 0 {
                     flag = true
@@ -276,7 +276,6 @@ struct Game<CardContent> where CardContent: Equatable {
         var zeros = true
         var new_arr = [[Card]]()
         for var row in cards {
-            for i in row {print(i.content)}
             zeros = true
             while zeros {
                 zeros = false

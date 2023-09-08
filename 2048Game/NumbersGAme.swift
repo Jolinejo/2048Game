@@ -60,15 +60,16 @@ class NumbersGame: ObservableObject {
         model.score
     }
     
-    var alert: Bool {
-            get {
-                model.on
-            }
-            set {
-                model.on = newValue
-            }
+    var running: Bool {
+        get {
+            model.running
+        }
+        set {
+            model.running = newValue
+        }
     }
-    var win: Bool {
+    
+   var win: Bool {
             get {
                 model.win
             }
