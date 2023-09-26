@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct Game<CardContent> where CardContent: Equatable {
+struct Game {
     
     private (set) var cards: Array<[Card]>
         
@@ -205,6 +205,7 @@ struct Game<CardContent> where CardContent: Equatable {
             gen_new()
         }
     }
+   
     mutating func left() {
         var flag = false
         var zeros = true

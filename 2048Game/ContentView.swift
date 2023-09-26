@@ -264,7 +264,7 @@ struct SecondView: View {
 }
 
 struct CardView: View {
-    let card: Game<String>.Card
+    let card: Game.Card
     
     var body: some View {
         ZStack {
